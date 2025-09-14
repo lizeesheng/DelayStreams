@@ -3,10 +3,25 @@
 #include <iomanip>
 #include <unistd.h>
 #include <conio.h>
+#include <windows.h>
+
 void defaultStopperOfDout(int& a,std::string& s)
 {
 	a=1;
 	s.clear();
+}
+void clrscr()
+{
+    HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+    CONSOLE_SCREEN_BUFFER_INFO csbi;
+    GetConsoleScreenBufferInfo(hConsole, &csbi);
+    DWORD dwConSize = csbi.dwSize.X * csbi.dwSize.Y;
+    COORD coordScreen = {0, 0};
+    DWORD cCharsWritten;
+    FillConsoleOutputCharacter(hConsole, (TCHAR)' ', dwConSize, coordScreen, &cCharsWritten);
+    GetConsoleScreenBufferInfo(hConsole, &csbi);
+    FillConsoleOutputAttribute(hConsole, csbi.wAttributes, dwConSize, coordScreen, &cCharsWritten);
+    SetConsoleCursorPosition(hConsole, coordScreen);
 }
 DelayOutStream::DelayOutStream()
 {
@@ -43,14 +58,23 @@ DelayOutStream::~DelayOutStream()
 {
 	clearBuffer();
 }
+void DelayOutStream::setColor(unsigned short color)
+{
+	HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+	SetConsoleTextAttribute(hConsole, color);
+}
 void DelayOutStream::outBuffer()
 {
+	if(isColorChange)
+	{
+		setColor(tmpMANI.value);
+	}
 	for(auto& i : streambuffer){
 		std::cout << i;
 		usleep(delayTime * 1000);
 		if(enableStopping){
-			if(_kbhit()){
-				if(_getch()==27){
+			if(kbhit()){
+				if(getch()==stopKey){
 					int status = 0;
 					std::string stopMsg;
 					stopMsg.clear();
@@ -67,6 +91,10 @@ void DelayOutStream::outBuffer()
 			}
 		}
 	}
+	if(isColorChange){
+		setColor(FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
+		isColorChange = false;
+	}
 }
 void DelayOutStream::clearBuffer()
 {
@@ -78,9 +106,10 @@ void DelayOutStream::setDelayTime(unsigned int time)
 {
 	delayTime = time;
 }
+
 DelayOutStream::DelayOutStreamVarsType DelayOutStream::getVars()
 {
-	return {streambuffer,tmpOSS,delayTime,precision,enableStopping,stopFunc};
+	return {streambuffer,tmpOSS,delayTime,precision,enableStopping,stopFunc,isColorChange};
 }
 std::string DelayOutStream::greatestIntegerOutput(__int128 num){
 	std::string rt = "";
@@ -106,6 +135,11 @@ void DelayOutStream::setStatusOfStopping(bool status,void (*stopFuncArg)(int&,st
 void DelayOutStream::setPrecision(int a)
 {
 	precision = a;
+}
+void DelayOutStream::clearStatus()
+{
+	isColorChange = false;
+	setColor(FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
 }
 DelayOutStream& DelayOutStream::operator<<(const bool outContent)
 {
@@ -238,4 +272,35 @@ DelayOutStream& DelayOutStream::operator<<(const std::string outContent)
 	clearBuffer();
 	return *this;
 }
-DelayOutStream dout(50,true,defaultStopperOfDout);
+DelayOutStream& DelayOutStream::operator<<(const MANIPULATION mani)
+{
+	switch(mani.type)
+	{
+	case 0:
+		streambuffer = '\n';
+		outBuffer();
+		break;
+	case 1:
+		streambuffer = '\r';
+		outBuffer();
+		break;
+	case 2:
+		isColorChange = true;
+		tmpMANI.type = mani.type;
+		tmpMANI.value = mani.value;
+		break;
+	case 3:
+		clrscr();
+		break;
+	}
+	clearBuffer();
+	return *this;
+}
+DelayOutStream::MANIPULATION setcolor(unsigned short color)
+{
+	return {2,color};
+}
+DelayOutStream::MANIPULATION linef = {0,-1};
+DelayOutStream::MANIPULATION carre = {1,-1};
+DelayOutStream::MANIPULATION cls = {3,-1};
+DelayOutStream dout(10,true,defaultStopperOfDout);
