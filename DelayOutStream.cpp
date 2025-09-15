@@ -102,6 +102,10 @@ void DelayOutStream::clearBuffer()
 	tmpOSS.str("");
 	streambuffer.clear();
 }
+void DelayOutStream::setStopKey(char key)
+{
+	stopKey = key;
+}
 void DelayOutStream::setDelayTime(unsigned int time)
 {
 	delayTime = time;
