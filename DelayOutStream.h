@@ -52,6 +52,7 @@ class DelayOutStream
 		void setColor(unsigned short color);
 		void outBuffer();
 		void clearBuffer();
+		void setStopKey(char key);
 		void setDelayTime(unsigned int time);
 		void setStatusOfStopping(bool status);
 		void setStatusOfStopping(bool status,void (*stopFuncArg)(int&,std::string&));
