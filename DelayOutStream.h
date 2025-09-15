@@ -25,6 +25,20 @@ class DelayOutStream
 		void (*stopFunc)(int&,std::string&);
 		std::ostringstream tmpOSS;
 	public:
+		enum KEY_CODE {
+			ESCAPE = 27,
+			DOT    = 110,
+			MINUS  = 109,
+			PLUS   = 107,
+			TIMES  = 106
+		};
+
+乘号	106	42
+加号	107	43
+Enter	13	13
+减号	109	45
+小数点	110	46
+除号
 		struct MANIPULATION
 		{
 			int type;
