@@ -25,37 +25,44 @@ void clrscr()
 }
 DelayOutStream::DelayOutStream()
 {
+	setColor(FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
 	clearBuffer();
 }
 DelayOutStream::DelayOutStream(bool status)
 {
+	setColor(FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
 	clearBuffer();
 	setStatusOfStopping(status,defaultStopperOfDout);
 }
 DelayOutStream::DelayOutStream(bool status,void (*stopFuncArg)(int&,std::string&))
 {
+	setColor(FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
 	clearBuffer();
 	setStatusOfStopping(status,stopFuncArg);
 }
 DelayOutStream::DelayOutStream(unsigned int time)
 {
+	setColor(FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
 	clearBuffer();
 	delayTime = time;
 }
 DelayOutStream::DelayOutStream(unsigned int time,bool status)
 {
+	setColor(FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
 	clearBuffer();
 	delayTime = time;
 	setStatusOfStopping(status,defaultStopperOfDout);
 }
 DelayOutStream::DelayOutStream(unsigned int time,bool status,void (*stopFuncArg)(int&,std::string&))
 {
+	setColor(FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
 	clearBuffer();
 	delayTime = time;
 	setStatusOfStopping(status,stopFuncArg);
 }
 DelayOutStream::~DelayOutStream()
 {
+	setColor(FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
 	clearBuffer();
 }
 void DelayOutStream::setColor(unsigned short color)
